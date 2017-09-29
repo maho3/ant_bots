@@ -1,0 +1,30 @@
+Inspiration
+
+ - ScriptBots - https://www.youtube.com/watch?v=RjweUYtpNq4
+ - MarI/O - https://pastebin.com/ZZmSNaHX
+ - EVAGENTS - https://github.com/GhengopelALPHA/Evagents
+
+
+09/28/17
+ - Design a system of evolutionary bots which fit some environment parameters
+ - Environment parameters:
+	- Need to eat to survive
+	- Food placed randomly around banana trees
+ - Input:
+	- Cone of vision in front, input is angle from straight ahead
+ - Output:
+	- Left/right wheel power
+ - Bot Parameters:
+	- Stomach (0 to 1)
+	- Position
+	- Size
+ - First see if I can get ants to follow food
+ - Future work:
+	- More complex input
+	- Study cooperation/interaction (produce walls?)
+
+ - End goal:
+	- Interesting and dynamic simulation
+	- Looks cool
+
+	
