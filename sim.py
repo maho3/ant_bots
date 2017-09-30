@@ -1,75 +1,71 @@
 import numpy as np
-import random 
-import math
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as anim
 
-class Bot:
-    
-    stomach=0.5
-    radius = 50
-    speed = 10
-    
-    theta = random.random()*2*math.pi
-    
-    def __init__(self, fieldX, fieldY):
-        self.x = random.random()*fieldX
-        self.y = random.random()*fieldY
-        self.BoundX = fieldX
-        self.BoundY = fieldY
+from bots import Bot
+from field import Field
 
-
-    def repeatBounds(self):
-        if self.x < 0:
-            self.x += self.BoundX
-        elif self.x > self.BoundX:
-            self.x -= self.BoundX
-
-        if self.y < 0:
-            self.y += self.BoundY
-        elif self.y > self.BoundY:
-            self.y -= self.BoundY  
-
-    def update(self):
-        v = 2*random.random()-1
-        
-        self.theta += v*math.pi
-        
-        self.x += self.speed * math.cos(self.theta)
-        self.y += self.speed * math.sin(self.theta)
-
-        self.repeatBounds()
-	
-        
-        return self.x, self.y, self.theta
-    
-
-fieldX = 1000
-fieldY = 1000
+fieldX = 2000
+fieldY = 2000
 frames = 1000
-botnum = 50
 
-botlist = [Bot(1000,1000) for i in range(botnum)]
+botnum = 500
 
-xs = [0]*frames
-ys = [0]*frames
-ths = [0]*frames
+treenum = 60
+bspawn = 0.3
+tradius = 100
+
+
+field = Field(fieldX, fieldY, treenum, bspawn, tradius)
+
+botlist = [Bot(field) for i in range(botnum)]
+
+xs = [0] * frames
+ys = [0] * frames
+ths = [0] * frames
+
+bxs = [0] * frames
+bys = [0] * frames
 
 for i in range(frames):
-    xs[i], ys[i], ths[i] = zip(*[botlist[i].update() for i in range(len(botlist))])
+	print(i+1)
+
+	field.update()
+
+	bs = []
+	for tree in field.trees:
+		bs += tree.b
+	bxs[i], bys[i] = zip(*bs)
+
+	for bot in botlist: bot.update(field)
+
+	botlist = [bot for bot in botlist if bot.life]
+
+	if len(botlist)==0: continue
+
+	xs[i], ys[i], ths[i] = zip(*[(bot.x, bot.y, bot.theta) for bot in botlist])
 
 fig, ax = plt.subplots()
 ax.set_xlim(0,fieldX)
 ax.set_ylim(0,fieldY)
 
-scat = ax.quiver(xs[0],ys[0],[0]*len(xs[0]), [1]*len(ys[0]))
+treexs, treeys = zip(*[(tree.x, tree.y) for tree in field.trees])
+treescat = ax.scatter(treexs, treeys,marker='o')
+
+botscat = ax.quiver(xs[0],ys[0],np.cos(np.array(ths[0])), np.cos(np.array(ths[0])),
+				 scale=75, headwidth=2, headlength=3)
+
+banscat = ax.scatter(bxs[0], bys[0], marker='.')
 
 def update(frame):
-	scat.set_offsets([i for i in zip(frame[0],frame[1])])
-	return scat,
+	botscat.set_offsets([i for i in zip(frame[0],frame[1])])
+	botscat.set_UVC(np.cos(np.array(frame[2])), np.sin(np.array(frame[2])))
 
-animation = anim.FuncAnimation(fig, update, [i for i in zip(xs,ys)], interval=50, blit=True)
+	banscat.set_offsets([i for i in zip(frame[3],frame[4])])
+	return botscat,banscat,
+
+animation = anim.FuncAnimation(fig, update, [i for i in zip(xs,ys,ths,bxs,bys)], interval=50, blit=True)
 plt.show()
 
 
