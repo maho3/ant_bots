@@ -38,6 +38,8 @@ for i in range(frames):
 		bs += tree.b
 	bxs[i], bys[i] = zip(*bs)
 
+	np.random.shuffle(botlist)
+
 	for bot in botlist: bot.update(field)
 
 	botlist = [bot for bot in botlist if bot.life]
